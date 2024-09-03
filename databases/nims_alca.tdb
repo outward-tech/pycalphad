@@ -1,0 +1,145 @@
+$ AlCa Associate
+$--------1---------2---------3---------4---------5---------6---------7---------8
+$
+$ TDB-file for the thermodynamic assessment of the Al-Ca system
+$
+$-----------------------------------------------------------------------------
+$ 2019.01.15
+$ 
+$ TDB file created by T.Abe, K.Hashimoto and  M.Mikami
+$
+$ Thermodynamics Modeling Group, National Institute for 
+$ Materials Science. 1-2-1 Sengen, Tsukuba, Ibaraki 305-0047, Japan
+$ e-mail: abe.taichi (at) nims.go.jp 
+$ Copyright (C) NIMS 2019
+$
+$ ------------------------------------------------------------------------------
+$ PARAMETERS ARE TAKEN FROM
+$ Thermodynamic assessment of the Al-Ca binary systems using random
+$ solution and associate models,
+$ Koray Ozturk, Lond-Qing Chen, Zi-Kui Liu, 
+$ J. alloys and compounds, 340 (2002) 199-206.
+$
+$ ------------------------------------------------------------------------------
+$ Comments
+$ Associate solution model is used for the liquid phase. Accordingly the Gibbs
+$ energy of the compounds are different from those in the regular solution 
+$ model in the same paper.
+$ Lattice stability is taken from Unary 5.0.
+$                                                                   T.A.                                                             
+$ ------------------------------------------------------------------------------
+ ELEMENT /-   ELECTRON_GAS              0.0000E+00  0.0000E+00  0.0000E+00!
+ ELEMENT VA   VACUUM                    0.0000E+00  0.0000E+00  0.0000E+00!
+ ELEMENT AL   FCC_A1                    2.6982E+01  4.5773E+03  2.8322E+01!
+ ELEMENT CA   FCC_A1                    4.0078E+01  6.1965E+03  4.1589E+01!
+
+ SPECIES  AL2CA  AL2CA1  !
+
+$ ------------------------------------------------------------------------------
+ TYPE_DEFINITION % SEQ *!
+ DEFINE_SYSTEM_DEFAULT ELEMENT 2 !
+ DEFAULT_COMMAND DEF_SYS_ELEMENT VA /- !
+
+$ ------------------------------------------------------------------------------
+$ FUNCTION AL
+$ ------------------------------------------------------------------------------
+  FUNCTION GHSERAL 298.15
+ -7976.15+137.093038*T-24.3671976*T*LN(T)-1.884662E-3*T**2-0.877664E-6*T**3
+ +74092*T**(-1); 700 Y
+ -11276.24+223.048446*T-38.5844296*T*LN(T)+18.531982E-3*T**2-5.764227E-6*T**3
+ +74092*T**(-1); 933.473 Y
+ -11278.361+188.684136*T-31.748192*T*LN(T)-1230.622E25*T**(-9); 6000 N !
+ 
+ FUNCTION GHCPAL 298.15 5481-1.8*T+GHSERAL; 6000 N !
+ 
+ FUNCTION GBCCAL 298.15 10083-4.813*T+GHSERAL; 6000 N !
+ 
+ FUNCTION GLIQAL 298.15 11005.045-11.84185*T+79.337E-21*T**7+GHSERAL; 933.473 Y
+ -795.991+177.430209*T-31.748192*T*LN(T); 6000 N !
+
+$ -----------------------------------------------------------------------------
+$  FUNCTION CA
+$ -----------------------------------------------------------------------------
+  FUNCTION GHSERCA  298.15
+ -4955.062+72.794266*T-16.3138*T*LN(T)-11.10455E-3*T**2-133574*T**(-1);
+ 1115.00 Y
+ -107304.428+799.982066*T-114.2922467*T*LN(T)+23.733814E-3*T**2-1.2438E-6*T**3
+ +18245540*T**(-1);  3000.00 Y
+ -3703.12+192.63995*T-35.0*T*LN(T); 3001 N !
+ 
+ FUNCTION GBCCCA   298.15
+ -7020.852+142.970155*T-28.2541*T*LN(T)+7.2326E-3*T**2-4.500217E-6*T**3
+ +60578*T**(-1);   716.00 Y
+ 1640.475+1.999694*T-6.276*T*LN(T)-16.1921E-3*T**2-523000*T**(-1);  1115.00 Y
+ -142331.096+1023.549046*T-143.8726979*T*LN(T)+32.543127E-3*T**2
+ -1.704079E-6*T**3+25353771*T**(-1);  3000.00 Y
+ 321.63+189.433057*T-35*T*LN(T); 3001 N !
+ 
+ FUNCTION GLIQCA   298.15
+ 5844.846+62.4838*T-16.3138*T*LN(T)-11.10455E-3*T**2-133574*T**(-1);   500.00 Y
+ 7838.856+18.2979*T-8.9874787*T*LN(T)-22.66537E-3*T**2+3.338303E-6*T**3
+ -230193*T**(-1);  1115.00 Y
+ -2654.938+188.9223*T-35*T*LN(T);  3001 N !
+ 
+ FUNCTION GHCPCA 298.15 500+0.7*T+GHSERCA; 3001 N !
+
+$ -----------------------------------------------------------------------------
+$ PARAMETERS FOR LIQUID PHASE
+$ -----------------------------------------------------------------------------
+  PHASE LIQUID:L % 1 1.0 !
+  CONSTITUENT LIQUID :AL,AL2CA,CA: ! 
+  PARAMETER L(LIQUID,AL;0) 298.15 +GLIQAL;                            6000 N !
+  PARAMETER L(LIQUID,CA;0) 298.15 +GLIQCA;                            6000 N !
+  PARAMETER G(LIQUID,AL2CA;0) 298.15
+   -77214+46.424*T+2*GLIQAL+GLIQCA;                                   6000 N !
+  PARAMETER L(LIQUID,AL,CA;0) 298.15 -68842+25.372*T;                 6000 N !
+  PARAMETER L(LIQUID,AL2CA,AL;0) 298.15 -30351+2.939*T;               6000 N !
+  PARAMETER L(LIQUID,AL2CA,CA;0) 298.15 -52132+0.848*T;               6000 N !
+
+$ ------------------------------------------------------------------------------
+$ PARAMETERS FOR FCC PHASE
+$ ------------------------------------------------------------------------------
+  TYPE_DEFINITION ( GES A_P_D FCC_A1 MAGNETIC -3.0 0.28 !
+  PHASE FCC_A1 %( 2 1 1 !
+  CONSTITUENT FCC_A1 : AL,CA : VA : !
+  PARAMETER G(FCC_A1,AL:VA;0) 298.15 GHSERAL;                         6000 N !
+  PARAMETER G(FCC_A1,CA:VA;0) 298.15 GHSERCA;                         6000 N !
+
+$ ------------------------------------------------------------------------------
+$ PARAMETERS FOR BCC PHASE
+$ ------------------------------------------------------------------------------
+
+  TYPE_DEFINITION & GES A_P_D BCC_A2 MAGNETIC -1.0 0.4 !
+  PHASE BCC_A2 %& 2 1 3 !
+  CONSTITUENT BCC_A2 :AL,CA : VA : !
+
+ 
+  PARAMETER G(BCC_A2,AL:VA;0) 298.15 GBCCAL;                          6000 N !
+  PARAMETER G(BCC_A2,CA:VA;0) 298.15 GBCCCA;                          6000 N !
+
+$ ------------------------------------------------------------------------------
+$  PARAMETERS FOR INTERMETALLIC COMPOUNDS
+$ ------------------------------------------------------------------------------
+
+  PHASE AL4CA1 % 2 4 1 !
+  CONSTITUENT AL4CA1 :AL:CA: !
+  PARAMETER G(AL4CA1,AL:CA;0) 298.15 
+               -105347+29.090*T+4*GHSERAL+1*GHSERCA;                  6000 N !
+
+  PHASE AL2CA1 % 2 2 1 !
+  CONSTITUENT AL2CA1 :AL:CA: !
+  PARAMETER G(AL2CA1,AL:CA;0) 298.15 
+              -95172+22.312*T+2*GHSERAL+1*GHSERCA;                    6000 N !
+
+  PHASE AL14CA13 % 2 14 13 !
+  CONSTITUENT AL14CA13 :AL:CA: !
+  PARAMETER G(AL14CA13,AL:CA;0) 298.15 
+               -666156+112.227*T+14*GHSERAL+13*GHSERCA;               6000 N !
+
+  PHASE AL3CA8 % 2 3 8 !
+  CONSTITUENT AL3CA8 :AL:CA: !
+  PARAMETER G(AL3CA8,AL:CA;0) 298.15 
+               -142722-0.194*T+3*GHSERAL+8*GHSERCA;                   6000 N !
+
+$ ----------------------------------------------------------------- END OF LINE
+$

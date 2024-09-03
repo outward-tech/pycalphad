@@ -1,0 +1,148 @@
+$AlO
+$ ------------------------------------------------------------------------------
+$ 2011.12.27
+$ 
+$ TDB file created by K.Hashimoto, T.Abe and Y.Sawada,
+$
+$ Particle Simulation and Thermodynamics Group, National Institute for 
+$ Materials Science. 1-2-1 Sengen, Tsukuba, Ibaraki 305-0047, Japan
+$ 
+$ e-mail: abe.taichi@nims.go.jp
+$
+$ Copyright (C) NIMS 2011
+$ -----------------------------------------------------------------------------
+$
+$        Thermodynamic evaluation of the Ti-Al-O ternary system.
+$        B.J.Lee and N.Saunders, Z.Metallkd., 88 (1997), 152-161.
+$               
+ ELEMENT /-   ELECTRON_GAS              0.0      0.0        0.0   !
+ ELEMENT VA   VACUUM                    0.0      0.0        0.0   !
+ ELEMENT AL   FCC_A1                    26.982   4577.3    28.322 !
+ ELEMENT O    1/2_MOLE_O2(G)            15.999   4341.0   102.52  !
+
+$ -----------------------------------------------------------------------------
+ SPECIES AL+3                        AL1/+3!
+ SPECIES O-2                         O1/-2!
+ SPECIES O2                          O2!
+
+ 
+ FUNCTION GHSERAL 298.15  -7976.15+137.093038*T-24.3671976*T*LN(T)
+      -0.001884662*T**2-8.77664E-07*T**3+74092*T**(-1);                 700  Y 
+      -11276.24+223.048446*T-38.5844296*T*LN(T)+0.018531982*T**2
+      -5.764227E-06*T**3+74092*T**(-1);                                933.47 Y
+      -11278.378+188.684153*T-31.748192*T*LN(T)-1.231E+28*T**(-9);    2900  N !
+                                                                        $ 91Din
+
+
+ FUNCTION GHCPAL     298.15  +5481-1.799*T+GHSERAL;                   6000  N !
+                                                                        $ 91Din
+ FUNCTION GALBCC     298.15  +10083-4.813*T+GHSERAL;                  2900  N !
+                                                                        $ 91Din
+
+
+
+ FUNCTION GO2GAS     298.14  -6961.74 -51.006076*T -22.272*T*LN(T)
+                 -.010197776*T**2 +1.323692E-06*T**3 -76730*T**(-1);    1000  Y
+      -13137.526+25.31976*T-33.6276*T*LN(T)
+      -.001191596*T**2+1.3562E-08*T**3+525810*T**(-1);                  3300  Y
+      -27973.456+62.51925*T-37.9072*T*LN(T)
+      -8.50486E-04*T**2+2.1442E-08*T**3+8766400*T**(-1);              6000  N !
+                                                                        $ 97Lee
+
+$ Corundum from 92Tay , CALPHAD 16 (1992), 173-179.   
+$ see M2O3 phase
+
+ FUNCTION GAL2O3     298.14  -1707351.298 +448.021092*T -67.4804*T*LN(T)
+      -0.06747*T**2 +14.205433E-06*T**3 +938780*T**(-1);                 600  Y
+      -1724886.064+754.856573*T-116.258*T*LN(T)
+      -0.0072257*T**2+0.278532E-06*T**3+2120700*T**(-1);                1500  Y
+      -1772163.194+1053.4548*T-156.058*T*LN(T)
+      +0.00709105*T**2-0.629402E-06*T**3+12366650*T**(-1);            3000  N !
+                                                                        $ 97Lee
+
+ FUNCTION ZERO       298.15   0.0;                                    6000  N !
+ FUNCTION UN_ASS     298.15   0.0;                                    6000  N !
+
+$------------------------------------------------------------------------------
+ TYPE_DEFINITION % SEQ * !
+ DEFINE_SYSTEM_DEFAULT ELEMENT 2 !
+ DEFAULT_COMMAND DEF_SYS_ELEMENT VA /-!
+$------------------------------------------------------------------------------
+
+
+ PHASE GAS:G %  1  1.0  !
+   CONSTITUENT GAS:G :O2 :  !
+                                  $       +RTLNP;          
+   PARAMETER G(GAS,O2;0)  298.15  +GO2GAS +R*T*LN(1E-05*P);           6000  N !
+
+
+ PHASE IO_LIQUID:Y %  2 1   1 !
+   CONSTITUENT IO_LIQUID:Y :AL+3 : O-2,VA :  !
+   PARAMETER G(IO_LIQUID,AL+3:O-2;0)  298.15  -1607850.8+405.559491*T
+      -67.4804*T*LN(T)-0.06747*T**2+1.4205433E-05*T**3+938780*T**(-1); 
+                                                                          600 Y
+                                              -1625385.57+712.394972*T
+      -116.258*T*LN(T)-0.0072257*T**2+2.78532E-07*T**3+2120700*T**(-1);
+                                                                         1500 Y
+                                              -1672662.69+1010.9932*T
+      -156.058*T*LN(T)+0.00709105*T**2-6.29402E-07*T**3+12366650*T**(-1);
+                                                                         1912 Y
+                                              +29178041.6-168360.926*T
+      +21987.1791*T*LN(T)-6.99552951*T**2+4.10226192E-04*T**3
+      -7.98843618E+09*T**(-1);                                           2327 Y
+      -1757702.05+1344.84833*T-192.464*T*LN(T);                        4000 N !
+                                                                        $ 97Lee
+
+   PARAMETER G(IO_LIQUID,AL+3:VA;0)       298.15  
+      +GHSERAL +11005.553-11.840873*T+7.9401E-20*T**7;                  933.6 Y
+      +GHSERAL +10481.974-11.252014*T+1.234264E+28*T**(-9); 
+                                                                       2900 N !
+                                                  $ 97Lee, (91Din=differ value)
+
+   PARAMETER G(IO_LIQUID,AL+3:O-2,VA;0)   298.15  +171042+106*T;       6000 N !
+                                                                        $ 97Lee
+
+
+ TYPE_DEFINITION & GES A_P_D BCC_A2 MAGNETIC  -1.0    0.4 !
+ PHASE BCC_A2  %&  2 1   3 !
+   CONSTITUENT BCC_A2  :AL : O, VA :  !
+   PARAMETER G(BCC_A2,AL:O;0)  298.15  +0.5*GAL2O3 +0.75*GO2GAS +200000; 
+                                                                       6000 N !
+                                                                        $ 97Lee
+   PARAMETER G(BCC_A2,AL:VA;0) 298.15  +GALBCC;                        2900 N !
+                                                                        $ 97Lee
+
+
+ TYPE_DEFINITION ( GES A_P_D FCC_A1 MAGNETIC  -3.0    0.28 !
+ PHASE FCC_A1  %(  2 1   1 !
+   CONSTITUENT FCC_A1  :AL : O, VA :  !
+   PARAMETER G(FCC_A1,AL:O;0)  298.15  +0.3333*GHSERAL +0.33333*GAL2O3 +200000;
+                                                                       6000 N !
+                                                                        $ 97Lee
+   PARAMETER G(FCC_A1,AL:VA;0) 298.15  -7976.15+137.071542*T-24.3671976*T*LN(T)
+      -0.001884662*T**2-8.77664E-07*T**3+74092*T**(-1);                   700 Y
+      -11276.24+223.02695*T-38.5844296*T*LN(T)+0.018531982*T**2
+      -5.764227E-06*T**3+74092*T**(-1);                                 933.6 Y
+      -11277.683+188.661987*T-31.748192*T*LN(T)-1.234264E+28*T**(-9);  6000 N !
+                                                                        $ 97Lee
+
+
+ TYPE_DEFINITION ) GES A_P_D HCP_A3 MAGNETIC  -3.0    0.28 !
+ PHASE HCP_A3  %)  2   1   0.5 !
+   CONSTITUENT HCP_A3  :AL : O,VA :  !
+   PARAMETER G(HCP_A3,AL:O;0)  298.15  +0.6666*GHSERAL +0.16666*GAL2O3 +189187;
+                                                                       6000 N !
+                                                                        $ 97Lee
+   PARAMETER G(HCP_A3,AL:VA;0) 298.15         +GHSERAL+5481-1.8*T;     2900 N !
+                                                                        $ 97Lee
+   PARAMETER G(HCP_A3,AL:O,VA;0)     298.15   -58908;                  6000 N !
+                                                                        $ 97Lee
+
+
+$alpha_M2O3
+ PHASE M2O3  %   2  2  3 !
+   CONSTITUENT M2O3  :AL+3 : O-2 : !
+   PARAMETER G(M2O3,AL+3:O-2;0)        298.15  +GAL2O3;                6000 N !
+                                                                        $ 97Lee
+
+$AlO_end

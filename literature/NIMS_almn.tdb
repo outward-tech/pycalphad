@@ -1,0 +1,201 @@
+$ AlMn
+$
+$ TDB-file for the thermodynamic assessment of the Al-Mn system
+$
+$------------------------------------------------------------------------------
+$ 2018.5.23
+$ 
+$ TDB file created by T.Abe, K.Hashimoto and Y.Sawada
+$
+$ Computational Structural Materials Design Group, National Institute for 
+$ Materials Science. 1-2-1 Sengen, Tsukuba, Ibaraki 305-0047, Japan
+$ e-mail: abe.taichi (at) nims.go.jp 
+$ Copyright (C) NIMS 2018
+$
+$ PARAMETERS ARE TAKEN FROM
+$ Reassessmnet of the Al-Mn system and a thermodynamic description of the
+$ Al-Mg-Mn system.
+$ Y.Du, J.Wang, J.Zhao, J.Clemens-Schuster, F.Weitzer, R.Schmid-Fetzer,
+$ M.Ohno, H.Xu, Z.K.Liu, S.Shang, W.Zhang, 
+$ Int.J.Mat.Res., 98 (2007) 855-871.
+
+$------------------------------------------------------------------------------
+$ Comments
+$ Gibbs energy of Pure elements are taken from Unary5.0
+$
+$ Site ratios are given in fractional form in the paper. To reproduce the 
+$ invariant reactions, in this TDB file, they are given 5 or 6 degits after 
+$ decimal point.
+$                                                           T.A.
+$------------------------------------------------------------------------------
+ ELEMENT /-   ELECTRON_GAS              0.0000E+00  0.0000E+00  0.0000E+00!
+ ELEMENT VA   VACUUM                    0.0000E+00  0.0000E+00  0.0000E+00!
+ ELEMENT AL   FCC_A1                    2.6982E+01  4.5773E+03  2.8322E+01!
+ ELEMENT MN   CBCC_A12                  5.4938E+01  4.9960E+03  3.2008E+01!
+
+$------------------------------------------------------------------------------
+$ Al
+$ -------------------------------------
+ FUNCTION GHSERAL 298.15
+ -7976.15+137.093038*T-24.3671976*T*LN(T)-1.884662E-3*T**2-0.877664E-6*T**3
+ +74092*T**(-1); 700 Y
+ -11276.24+223.048446*T-38.5844296*T*LN(T)+18.531982E-3*T**2-5.764227E-6*T**3
+ +74092*T**(-1); 933.473 Y
+ -11278.361+188.684136*T-31.748192*T*LN(T)-1230.622E25*T**(-9); 2900 N !
+ 
+ FUNCTION GHCPAL 298.15 5481-1.8*T+GHSERAL; 2900 N !
+ 
+ FUNCTION GBCCAL 298.15 10083-4.813*T+GHSERAL; 2900 N !
+ 
+ FUNCTION GLIQAL 298.15 11005.045-11.84185*T+79.337E-21*T**7+GHSERAL; 933.473 Y
+  -795.991+177.430209*T-31.748192*T*LN(T); 2900 N !
+
+ FUNCTION GCBCCAL 298.15 10083.4-4.813*T+GHSERAL; 2900 N !
+ FUNCTION GCUBAL 298.15 10920.44-4.8116*T+GHSERAL; 2900 N !
+
+$ Mn
+$ -------------------------------------
+ FUNCTION GHSERMN  298.15
+ -8115.28+130.059*T-23.4582*T*LN(T)-7.34768E-3*T**2+69827*T**(-1);  1519.00 Y
+ -28733.41+312.2648*T-48*T*LN(T)+1656.847E27*T**(-9);  2000.00 N !
+ 
+ FUNCTION GFCCMN   298.15
+ -3439.3+131.884*T-24.5177*T*LN(T)-6E-3*T**2+69600*T**(-1);  1519.00 Y
+ -26070.1+309.6664*T-48*T*LN(T)+386.196E28*T**(-9);  2000.00 N !
+ 
+ FUNCTION GBCCMN   298.15
+ -3235.3+127.85*T-23.7*T*LN(T)-7.44271E-3*T**2+60000*T**(-1);  1519.00 Y
+ -23188.83+307.7043*T-48*T*LN(T)+1265.152E27*T**(-9);  2000.00 N !
+ 
+ FUNCTION GLIQMN 298.15 17859.91-12.6208*T-441.929E-23*T**7+GHSERMN; 1519 Y
+ -9993.9+299.036*T-48*T*LN(T);  2000.00 N !
+ 
+ FUNCTION GHCPMN   298.15
+ -4439.3+133.007*T-24.5177*T*LN(T)-6E-3*T**2+69600*T**(-1);  1519.00 Y
+ -27070.1+310.7894*T-48*T*LN(T)+386.196E28*T**(-9);  2000.00 N !
+
+ FUNCTION GCUBMN   298.15
+ -5800.4+135.995*T-24.8785*T*LN(T)-5.83359E-3*T**2+70269*T**(-1);  1519.00 Y
+ -28290.76+311.2933*T-48*T*LN(T)+396.757E28*T**(-9);  2000.00 N !
+
+$------------------------------------------------------------------------------
+ TYPE_DEFINITION % SEQ *!
+ DEFINE_SYSTEM_DEFAULT ELEMENT 2 !
+ DEFAULT_COMMAND DEF_SYS_ELEMENT VA /- !
+
+$------------------------------------------------------------------------------
+$ PARAMETERS FOR LIQUID PHASE
+$------------------------------------------------------------------------------
+ PHASE LIQUID  %  1  1.0  !
+    CONSTITUENT LIQUID  :AL,MN :  !
+   PARAMETER G(LIQUID,AL;0)  298.15  +GLIQAL;                         2900 N !
+   PARAMETER G(LIQUID,MN;0)  298.15  +GLIQMN;                         2000 N !
+   PARAMETER G(LIQUID,AL,MN;0) 298.15  -70584.9+28.22693*T;           6000 N !
+   PARAMETER G(LIQUID,AL,MN;1) 298.15  -13293.5+9.82551*T;            6000 N !
+
+$------------------------------------------------------------------------------
+$ PARAMETERS FOR BCC(δMn)
+$------------------------------------------------------------------------------
+ PHASE BCC  %  2  1  3 !
+    CONSTITUENT BCC  :AL,MN:  VA:   !
+   PARAMETER G(BCC,AL:VA;0)      298.15  +GBCCAL;                     2900 N !
+   PARAMETER G(BCC,MN:VA;0)      298.15  +GBCCMN;                     2000 N !
+   PARAMETER G(BCC,AL,MN:VA;0)   298.15  -111336.2+44.48059*T;        6000 N !
+   PARAMETER G(BCC,AL,MN:VA;1)   298.15  -68691.8+44.52653*T;         6000 N !
+
+$------------------------------------------------------------------------------
+$ PARAMETERS FOR FCC(γMn)
+$------------------------------------------------------------------------------
+ PHASE FCC  %  2  1  1 !
+    CONSTITUENT FCC  :AL,MN:  VA:   !
+   PARAMETER G(FCC,AL:VA;0)      298.15  +GHSERAL;                    2900 N !
+   PARAMETER G(FCC,MN:VA;0)      298.15  +GFCCMN;                     2000 N !
+   PARAMETER G(FCC,AL,MN:VA;0)   298.15  -69938.0+27.17958*T;         6000 N !
+   PARAMETER G(FCC,AL,MN:VA;1)   298.15  +8248.9;                     6000 N !
+
+$------------------------------------------------------------------------------
+$ PARAMETERS FOR CBCC(αMn)
+$------------------------------------------------------------------------------
+ PHASE CBCC %  2 1 1 !
+    CONSTITUENT CBCC  :AL,MN:  VA:   !
+   PARAMETER G(CBCC,AL:VA;0)      298.15  +GCBCCAL;                   2900 N !
+   PARAMETER G(CBCC,MN:VA;0)      298.15  +GHSERMN;                   2000 N !
+   PARAMETER G(CBCC,AL,MN:VA;0)   298.15  -63000+21*T;                6000 N !
+
+$------------------------------------------------------------------------------
+$ PARAMETERS FOR CUB(βMn)
+$------------------------------------------------------------------------------
+ PHASE CUB % 2 1 1 !
+    CONSTITUENT CUB : AL,MN : VA : !
+   PARAMETER G(CUB,AL:VA;0)      298.15  +GCUBAL;                     3000 N !
+   PARAMETER G(CUB,MN:VA;0)      298.15  +GCUBMN;                     2000 N !
+   PARAMETER G(CUB,AL,MN:VA;0)   298.15  -118512.3+52.73979*T;        6000 N !
+   PARAMETER G(CUB,AL,MN:VA;1)   298.15  -3174.9;                     6000 N !
+
+$------------------------------------------------------------------------------
+$ PARAMETERS FOR HCP_A3 PHASE
+$------------------------------------------------------------------------------
+ PHASE HCP  %  2 1   .5 !
+    CONSTITUENT HCP  :AL,MN: VA :  !
+   PARAMETER G(HCP,AL:VA;0)  298.15  +GHCPAL;                         2900 N !
+   PARAMETER G(HCP,MN:VA;0)  298.15  +GHCPMN;                         2000 N !
+   PARAMETER G(HCP,AL,MN:VA;0)  298.15  -95264.1+33.09659*T;          6000 N !
+   PARAMETER G(HCP,AL,MN:VA;1)  298.15  -56880.6+43.14119*T;          6000 N !
+   PARAMETER G(HCP,AL,MN:VA;2)  298.15  +14430.2;                     6000 N !
+
+$------------------------------------------------------------------------------
+$ PARAMETERS FOR STOICHIOMETRIC COMPOUND
+$------------------------------------------------------------------------------
+$fraction=小数点以下5桁
+$ PHASE AL12MN  %  2 0.92308  0.07692 !
+$  CONSTITUENT AL12MN :AL : MN :  !
+$  PARAMETER G(AL12MN,AL:MN;0)  298.15
+$     -8491.5+2.8305*T+0.92308*GHSERAL+0.07692*GHSERMN;               6000 N !
+
+$fraction=小数点以下6桁==>この相に関しては必須条件
+ PHASE AL12MN  %  2 0.923077  0.076923 !
+  CONSTITUENT AL12MN :AL : MN :  !
+  PARAMETER G(AL12MN,AL:MN;0)  298.15
+     -8491.5+2.8305*T+0.923077*GHSERAL+0.076923*GHSERMN;              6000 N !
+
+ PHASE AL6MN  %  2 0.85714  0.14286 !
+  CONSTITUENT AL6MN :AL : MN :  !
+  PARAMETER G(AL6MN,AL:MN;0)  298.15
+     -15584.4+5.03087*T+0.85714*GHSERAL+0.14286*GHSERMN;              6000 N !
+
+ PHASE LTAL11MN4  %  2 0.73333  0.26667 !
+  CONSTITUENT LTAL11MN4 :AL : MN :  !
+  PARAMETER G(LTAL11MN4,AL:MN;0)  298.15
+     -23370.0+6.52661*T+0.73333*GHSERAL+0.26667*GHSERMN;              6000 N !
+
+ PHASE LAMBDA_AL4MN  %  2 0.81162  0.18838 !
+  CONSTITUENT LAMBDA_AL4MN :AL : MN :  !
+  PARAMETER G(LAMBDA_AL4MN,AL:MN;0)  298.15
+    -20546.3+6.84875*T+0.81162*GHSERAL+0.18838*GHSERMN;               6000 N !
+
+ PHASE MU_AL4MN  %  2 0.8  0.2 !
+  CONSTITUENT MU_AL4MN :AL : MN :  !
+  PARAMETER G(MU_AL4MN,AL:MN;0)  298.15
+     -21817.7+7.33294*T+0.8*GHSERAL+0.2*GHSERMN;                      6000 N !
+
+$------------------------------------------------------------------------------
+$ PARAMETERS FOR  COMPOUND
+$------------------------------------------------------------------------------
+ PHASE AL8MN5  %  3 0.46154  0.19231  0.34615 !
+  CONSTITUENT AL8MN5 :AL :MN :AL,MN :  !
+  PARAMETER G(AL8MN5,AL:MN:AL;0)  298.15
+     -7686.6-2.33321*T+0.80769*GHSERAL+0.19231*GHSERMN;               6000 N !
+  PARAMETER G(AL8MN5,AL:MN:MN;0)  298.15
+     -30437.8+11.13379*T+0.46154*GHSERAL+0.53846*GHSERMN;             6000 N !
+  PARAMETER G(AL8MN5,AL:MN:AL,MN;0)  298.15  -20084.2+9.39798*T;      6000 N !
+  PARAMETER G(AL8MN5,AL:MN:AL,MN;1)  298.15  +1462.1;                 6000 N !
+
+ PHASE HTAL11MN4  % 2 0.74359 0.25641 !
+  CONSTITUENT HTAL11MN4 :AL,MN :MN :  !
+  PARAMETER G(HTAL11MN4,AL:MN;0) 298.15
+     -19101.1+3.34253*T+0.74359*GHSERAL+0.25641*GHSERMN;              6000 N !
+  PARAMETER G(HTAL11MN4,MN:MN;0) 298.15  +5000+GHSERMN;               6000 N !
+  PARAMETER G(HTAL11MN4,AL,MN:MN;0) 298.15  -17026.5;                 6000 N !
+
+$ END
+$------------------------------------------------------------------------------
