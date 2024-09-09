@@ -3,7 +3,7 @@ from sympy import symbols, sympify, log
 
 class Parameter:
     def __init__(self, param_string, func_list):
-        pattern = r'PARAMETER [L,G]\(([^,]+),([^;]+);([^)]*)\)\s(\d+(\.\d+)?)\s+(\S+)\s+(\S+)\s+'
+        pattern = r'PARAMETER [L,G]\(([^,]+),([^;]+);([^)]*)\)\s+(\d+(\.\d+)?)\s+(\S+)\s+(\S+)\s+'
         match = re.search(pattern, param_string)
         if match:
             self.phase = match.group(1)
