@@ -30,6 +30,7 @@ import datetime
 import warnings
 import hashlib
 from copy import deepcopy
+from tinydb import Query
 
 
 _AST_WHITELIST = [ast.Add, ast.BinOp, ast.Call, ast.Constant, ast.Div,
@@ -650,7 +651,7 @@ def get_supported_variables():
     return {Symbol(x): getattr(v, x) for x in v.__dict__ if isinstance(getattr(v, x), (v.IndependentPotential, Float))}
 
 
-def write_tdb(dbf, fd, groupby='subsystem', if_incompatible='warn'):
+def write_tdb(dbf, fd, groupby='phase', if_incompatible='warn'):
     """
     Write a TDB file from a pycalphad Database object.
 
@@ -893,7 +894,7 @@ def write_tdb(dbf, fd, groupby='subsystem', if_incompatible='warn'):
                     output += write_parameter(parameter)
     elif groupby == 'phase':
         for phase_name in sorted(dbf.phases.keys()):
-            parameters = sorted(param_sorted[phase_name])
+            parameters = (param_sorted[phase_name])
             if len(parameters) > 0:
                 output += "\n\n"
                 output += "$" * maxlen + "\n"
@@ -971,6 +972,51 @@ def read_tdb(dbf, fd):
     # Add phase option B/F parameters
     # Must occur after adding model hints and parameters
     add_phase_symmetry_ordering_parameters(dbf)
+
+
+def add_two_database(db, db_2):
+    db.species = db.species.union(db_2.species)
+    db.elements = db.elements.union(db_2.elements)
+
+    for phase_name in db_2.phases:
+        db.add_phase(db_2.phases[phase_name].name, db_2.phases[phase_name].model_hints, db_2.phases[phase_name].sublattices)
+
+        constituent_array = []
+        for sublattice in (db_2.phases[phase_name].constituents):
+            sublattice_list = []
+            for constintuent in sublattice:
+                sublattice_list.append(constintuent.name)  
+
+            constituent_array.append(sublattice_list)
+
+        db.add_phase_constituents(db_2.phases[phase_name].name, constituent_array)
+
+    for parameter in db_2._parameters.all():
+        # print(parameter['constituent_array'])
+
+        constituent_array = []
+        for sublattice in parameter['constituent_array']:
+            sublattice_constituents = []
+            for species in sublattice:
+                sublattice_constituents.append(species.name)
+            constituent_array.append(sublattice_constituents)
+
+        pareameter_query = Query()
+
+        if len(db._parameters.search(
+            pareameter_query.parameter == parameter['parameter']
+        )) == 0:
+            db.add_parameter(
+                parameter['parameter_type'],
+                parameter['phase_name'],
+                constituent_array,
+                parameter['parameter_order'],
+                parameter['parameter'],
+                parameter['reference'],
+                parameter['diffusing_species'],
+                force_insert=True
+            )
+    return db
 
 
 Database.register_format("tdb", read=read_tdb, write=write_tdb)
