@@ -1016,6 +1016,11 @@ def add_two_database(db, db_2):
                 parameter['diffusing_species'],
                 force_insert=True
             )
+
+    for ref_state in db_2.refstates:
+        if ref_state not in db.refstates:
+            db.refstates[ref_state] = db_2.refstates[ref_state]
+
     return db
 
 

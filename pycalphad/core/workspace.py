@@ -130,19 +130,19 @@ class ComponentsField(TypedField):
         super().__init__(default_factory=lambda obj: unpack_components(obj.database, sorted(x.name for x in obj.database.species if x.name != '/-')),
                          depends_on=depends_on)
     def __set__(self, obj, value):
-        comps = (unpack_components(obj.database, value))
+        comps = sorted(unpack_components(obj.database, value))
         super().__set__(obj, comps)
 
     def __get__(self, obj, objtype=None):
         getobj = super().__get__(obj, objtype=objtype)
-        return (unpack_components(obj.database, getobj))
+        return sorted(unpack_components(obj.database, getobj))
 
 class PhasesField(TypedField):
     def __init__(self, depends_on=None):
         super().__init__(default_factory=lambda obj: filter_phases(obj.database, obj.components),
                          depends_on=depends_on)
     def __set__(self, obj, value):
-        phases = unpack_phases(value)
+        phases = sorted(unpack_phases(value))
         super().__set__(obj, phases)
 
     def __get__(self, obj, objtype=None):
@@ -301,7 +301,7 @@ class Workspace:
                                        self.verbose, solver=self.solver)
 
     def _detect_phase_multiplicity(self):
-        multiplicity = {k: 0 for k in (self.phase_record_factory.keys())}
+        multiplicity = {k: 0 for k in sorted(self.phase_record_factory.keys())}
         prop_GM_values = self.eq.GM
         prop_Phase_values = self.eq.Phase
         for index in np.ndindex(prop_GM_values.shape):
@@ -322,7 +322,7 @@ class Workspace:
         while i < len(args):
             if hasattr(args[i], 'phase_name') and args[i].phase_name == '*':
                 indices_to_delete.append(i)
-                phase_names = (self.phase_record_factory.keys())
+                phase_names = sorted(self.phase_record_factory.keys())
                 additional_args = args[i].expand_wildcard(phase_names=phase_names)
                 args.extend(additional_args)
             elif hasattr(args[i], 'species') and args[i].species == v.Species('*'):
